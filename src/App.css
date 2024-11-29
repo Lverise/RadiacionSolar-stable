@@ -1,16 +1,8 @@
-/* Estilos generales para la aplicación */
-.app-container {
+
+body{
   font-family: 'Arial', sans-serif;
   background-color: #f4f4f4;
-  padding: 20px;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  justify-content: flex-start;
 }
-
 
 header {
   text-align: center;
@@ -88,6 +80,11 @@ h1 {
   flex-shrink: 0; /* Evita que el mapa se reduzca */
 }
 
+/* Estilo para el contenedor del boton admin */
+.admin-login-container{
+  align-items: center;
+  align-content: center;
+}
 /* Estilo para el botón "admin" */
 .admin-button {
   background-color: #4C8BF5; /* Azul más oscuro que el de exportar Excel */
