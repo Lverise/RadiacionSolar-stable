@@ -103,13 +103,33 @@ const handleCommentSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   if (comment && !isCommenting) {
-    setIsCommenting(true);  // Activar bloqueo para evitar registros duplicados
-    await saveComment(comment, uvValue, lat, lng);  // Guardar el comentario
-    setComment("");  // Limpiar el campo de comentario
-    fetchComments();  // Actualizar la lista de comentarios
-    setIsCommenting(false);  // Desbloquear el registro
+    setIsCommenting(true); // Bloquea nuevas interacciones
+    try {
+      // Verifica si ya se guardó el comentario para evitar duplicados
+      const existingData = await getUVDataFromFirestore(`${lat}-${lng}`);
+      if (existingData?.comment === comment) {
+        console.log("El comentario ya ha sido guardado.");
+        return; // Evita guardar un comentario duplicado
+      }
+
+      // Obtener y guardar los datos UV solo si es necesario
+      await fetchUVData(lat, lng, true); // Guardar datos UV
+
+      // Guardar el comentario
+      await saveComment(comment, uvValue, lat, lng);
+
+      setComment(""); // Limpia el campo de comentario
+      fetchComments(); // Actualiza la lista de comentarios
+    } catch (error) {
+      console.error("Error al guardar el comentario:", error);
+    }
+    setIsCommenting(false); // Desbloquea interacciones
   }
 };
+
+
+
+
 
 
 
@@ -121,7 +141,8 @@ const handleCommentSubmit = async (e: React.FormEvent) => {
   }, []);
 
   // Guardar datos en Firestore con la ID única
-  const saveUVDataToFirestore = async (dataId: string, lat: number, lng: number, uv: number) => {
+const saveUVDataToFirestore = async (dataId: string, lat: number, lng: number, uv: number, comment: string) => {
+  if (comment.trim()) { // Solo guarda si hay comentario
     const timestamp = new Date().getTime();  // Obtén el timestamp actual en milisegundos
     const dateString = new Date(timestamp).toLocaleString();  // Fecha en formato legible
 
@@ -131,9 +152,12 @@ const handleCommentSubmit = async (e: React.FormEvent) => {
       timestamp,
       dateString,  // Guardar la fecha en formato legible
       lat,
-      lng
+      lng,
+      comment,  // Agregar comentario
     });
-  };
+  }
+};
+
 
   // Recuperar datos de Firestore usando la ID única
   const getUVDataFromFirestore = async (dataId: string) => {
@@ -146,22 +170,19 @@ const handleCommentSubmit = async (e: React.FormEvent) => {
     return null;
   };
 
-  const fetchUVData = async (lat: number, lng: number) => {
+  const fetchUVData = async (lat: number, lng: number, shouldSave: boolean = false) => {
     const now = new Date().getTime();
     
     // Generar una ID única basada en las coordenadas y el timestamp
-    const dataId = `${lat}-${lng}-${Math.floor(now / (3 * 60 * 60 * 1000))}`; // Dividir el timestamp por 3 horas para tener una actualización cada 3 horas
-  
-    // Verifica si las coordenadas actuales son diferentes de las anteriores
-    if (lat === lat && lng === lng) {
-      return; // Si las coordenadas son iguales, no hacer nada
-    }
-  
+    const dataId = `${lat}-${lng}-${Math.floor(now / (3 * 60 * 60 * 1000))}`;
+    
     try {
-      // Intentar obtener los datos desde Firestore usando la ID única
+      console.log("Consultando datos UV para coordenadas:", lat, lng);
+      
+      // Intentar obtener datos desde Firestore
       const cachedData = await getUVDataFromFirestore(dataId);
-  
-      if (cachedData && now - cachedData.timestamp < 3 * 60 * 60 * 1000) {  // 3 horas
+      if (cachedData) {
+        console.log("Datos UV obtenidos de Firestore:", cachedData);
         const uv = cachedData.uv;
         setUVValue(uv);
         const level = calculateUVLevel(uv);
@@ -169,38 +190,45 @@ const handleCommentSubmit = async (e: React.FormEvent) => {
         updateUVBar(level);
         return;
       }
-  
-      // Si no hay datos válidos en Firestore, llama a la API
+      
+      // Consultar datos desde la API de OpenUV
+      console.log("Llamando a la API de OpenUV...");
       const headers = new Headers();
-      headers.append("x-access-token", "openuv-9uguimrm3ytpsys-io");
+      headers.append("x-access-token", "openuv-cfawfrm4312cm2-io");
       headers.append("Content-Type", "application/json");
-  
+      
       const url = `https://api.openuv.io/api/v1/uv?lat=${lat}&lng=${lng}`;
       const response = await fetch(url, { method: "GET", headers });
-  
+      
       if (!response.ok) {
+        console.error(`Error en la API: ${response.statusText}`);
         if (response.status === 429) {
-          throw new Error("Límite de solicitudes alcanzado. Intenta más tarde.");
+          alert("Límite de solicitudes alcanzado. Intenta más tarde.");
         }
-        throw new Error(`Error de la API: ${response.statusText}`);
+        return;
       }
-  
+      
       const result: { result: UVData } = await response.json();
       const uv = result.result.uv;
-  
-      // Actualizar estados y guardar en Firestore
+      
+      console.log("Datos UV obtenidos de la API:", uv);
+      
+      // Actualizar estado
       setUVValue(uv);
       const level = calculateUVLevel(uv);
       setUVLevel(level);
       updateUVBar(level);
-  
-      // Guardar los datos con la nueva ID
-      await saveUVDataToFirestore(dataId, lat, lng, uv);
-  
+      
+      // Guardar en Firestore solo si se especifica
+      if (shouldSave) {
+        await saveUVDataToFirestore(dataId, lat, lng, uv, comment);
+        console.log("Datos UV guardados en Firestore con ID:", dataId);
+      }
     } catch (error) {
-      console.error("Error fetching UV data:", error);
+      console.error("Error al obtener datos UV:", error);
     }
   };
+  
   
 
   const calculateUVLevel = (uv: number): number => {
@@ -247,25 +275,29 @@ const handleCommentSubmit = async (e: React.FormEvent) => {
     let marker: google.maps.Marker | null = null;
   
     map.addListener("click", (event: google.maps.MapMouseEvent) => {
-      const newLat = event.latLng?.lat()!;
-      const newLng = event.latLng?.lng()!;
+      if (!isCommenting) { // Evitar actualizar coordenadas mientras se está comentando
+        const newLat = event.latLng?.lat()!;
+        const newLng = event.latLng?.lng()!;
   
-      setLat(newLat);  // Actualizar latitud
-      setLng(newLng);  // Actualizar longitud
+        setLat(newLat);
+        setLng(newLng);
+        fetchUVData(newLat, newLng); // Actualizar los datos UV con la nueva ubicación
+        // Nota: No se guarda nada hasta que el comentario se haya guardado
   
-      if (marker) {
-        marker.setPosition(event.latLng!);
-      } else {
-        marker = new google.maps.Marker({
-          position: event.latLng!,
-          map,
-        });
+        if (marker) {
+          marker.setPosition(event.latLng!);
+        } else {
+          marker = new google.maps.Marker({
+            position: event.latLng!,
+            map,
+          });
+        }
       }
-  
-      fetchUVData(newLat, newLng);
     });
   };
-
+  
+  
+  
   const exportToExcel = async () => {
     try {
       const uvDataSnapshot = await getDocs(collection(db, "uvData"));
