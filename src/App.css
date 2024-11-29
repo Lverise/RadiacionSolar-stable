@@ -7,9 +7,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 90vh;
+  height: 100vh;
   justify-content: flex-start;
 }
+
 
 header {
   text-align: center;
@@ -27,7 +28,7 @@ h1 {
   padding-top: 10px;
 }
 
-input{
+.input-login{
   border-style: solid;
   display: block;
   border-radius: 8px;
@@ -37,14 +38,16 @@ input{
 }
 
 /* Estilos para la sección de información de UV */
+/* Contenedor que incluye el mapa y la información UV */
 .container {
   display: flex;
-  flex-direction: row; /* Elementos en fila (información UV y mapa) */
+  flex-direction: row; /* Elementos en fila */
   gap: 20px;
   width: 100%;
   justify-content: space-between;
   padding: 20px;
-  flex-grow: 0.7;
+  flex-grow: 1; /* Deja que el contenedor crezca */
+  height: 70vh; /* Aumenta la altura para que ocupe más espacio en la pantalla */
 }
 
 .uv-info {
@@ -55,8 +58,7 @@ input{
   width: 48%; /* Asegura que ambas secciones tengan el mismo tamaño */
   text-align: center;
   margin: 0 auto;
-  flex-shrink: 0;
-  
+  flex-shrink: 0; /* Asegura que la sección de UV no se reduzca */
 }
 
 .uv-info p {
@@ -83,6 +85,7 @@ input{
   height: 100%;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0; /* Evita que el mapa se reduzca */
 }
 
 /* Estilo para el botón "admin" */
@@ -137,4 +140,60 @@ input{
   margin: auto;
   margin-top: 20px;
   display: block;
+}
+
+/* Estilos para la tabla de comentarios */
+.comments-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin-top: 20px;
+  min-height: 200px; /* Establece una altura mínima para la tabla */
+}
+
+.comments-table-header {
+  background-color: #4C8BF5;
+  color: white;
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+}
+
+.comments-table-row:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.comments-table-row:hover {
+  background-color: #f1f1f1;
+}
+
+.comments-table-cell {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+  overflow: hidden; /* Evita el desbordamiento de contenido */
+  text-overflow: ellipsis; /* Añade puntos suspensivos si el contenido es demasiado largo */
+}
+
+.comments-table td, .comments-table th {
+  font-size: 1.1rem;
+}
+
+.comments-table th {
+  text-align: center;
+  min-width: 100px; /* Establece un ancho mínimo para las celdas */
+}
+.textarea-comentario {
+  display: block;
+  width: 98%;  /* Ocupa casi todo el ancho disponible */
+  font-size: 18px;  /* Tamaño de la fuente */
+  height: 80px;  /* Altura fija para que sea adecuado para 3 líneas de texto */
+  border: 1px solid #ccc;  /* Borde gris */
+  border-radius: 8px;  /* Bordes redondeados */
+  margin-bottom: 12px;  /* Espacio entre el input y el botón */
+  padding: 12px;  /* Padding para mejorar la legibilidad */
+  overflow-y: auto;  /* Permite desplazamiento vertical cuando el texto es largo */
+  resize: none;  /* Evita que el usuario cambie el tamaño del textarea */
+  white-space: normal;  /* Permite que el texto se envuelva a la siguiente línea */
+  word-wrap: break-word;  /* Asegura que las palabras largas se ajusten dentro del textarea */
 }
