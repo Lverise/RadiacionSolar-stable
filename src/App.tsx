@@ -330,7 +330,49 @@ const handleCommentSubmit = async (e: React.FormEvent) => {
         <div id="map" className="map" />
       
       </div>
-      <div className="admin-login-container">
+
+        <div>
+      {/* Formulario para agregar un comentario */}
+      <form onSubmit={handleCommentSubmit}>
+  <textarea
+    id="input-comentario"
+    value={comment}
+    onChange={(e) => setComment(e.target.value)}
+    placeholder="Agregar un comentario"
+    className="textarea-comentario"
+  />
+  <button className="login-button" type="submit">Guardar Comentario</button>
+</form>
+
+{/* Tabla para mostrar los comentarios */}
+<table className="comments-table">
+  <thead>
+    <tr>
+      <th className="comments-table-header">índice de UV</th>
+      <th className="comments-table-header">Comentario</th>
+      <th className="comments-table-header">Latitud</th>
+      <th className="comments-table-header">Longitud</th>
+      <th className="comments-table-header">Hora de Consulta</th>  {/* Nueva columna */}
+      <th className="comments-table-header">*</th>
+    </tr>
+  </thead>
+  <tbody>
+    {commentsData.map((comment) => (
+      <tr key={comment.id} className="comments-table-row">
+        <td className="comments-table-cell">{comment.uv}</td>
+        <td className="comments-table-cell">{comment.comment}</td>
+        <td className="comments-table-cell">{comment.lat}</td> {/* Mostrar latitud */}
+        <td className="comments-table-cell">{comment.lng}</td> {/* Mostrar longitud */}
+        <td className="comments-table-cell">
+          {new Date(comment.timestamp).toLocaleString()} {/* Mostrar hora en formato legible */}
+        </td>
+        <td className="comments-table-cell"><button onClick={() => deleteComment(comment.id)}>Eliminar</button></td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+    </div>
+    <div className="admin-login-container">
       <button className="admin-button" onClick={() => setShowLogin(prev => !prev)}>
   {showLogin ? "Cerrar Admin" : "Admin"}
 </button>
@@ -360,49 +402,6 @@ const handleCommentSubmit = async (e: React.FormEvent) => {
             </div>
           </div>
         )}
-        <div>
-      {/* Formulario para agregar un comentario */}
-      <form onSubmit={handleCommentSubmit}>
-  <textarea
-    id="input-comentario"
-    value={comment}
-    onChange={(e) => setComment(e.target.value)}
-    placeholder="Agregar un comentario"
-    className="textarea-comentario"
-  />
-  <button className="login-button" type="submit">Guardar Comentario</button>
-</form>
-
-{/* Tabla para mostrar los comentarios */}
-<table className="comments-table">
-  <thead>
-    <tr>
-      <th className="comments-table-header">ID</th>
-      <th className="comments-table-header">UV</th>
-      <th className="comments-table-header">Comentario</th>
-      <th className="comments-table-header">Latitud</th>
-      <th className="comments-table-header">Longitud</th>
-      <th className="comments-table-header">Hora de Consulta</th>  {/* Nueva columna */}
-      <th className="comments-table-header">*</th>
-    </tr>
-  </thead>
-  <tbody>
-    {commentsData.map((comment) => (
-      <tr key={comment.id} className="comments-table-row">
-        <td className="comments-table-cell">{comment.id}</td>
-        <td className="comments-table-cell">{comment.uv}</td>
-        <td className="comments-table-cell">{comment.comment}</td>
-        <td className="comments-table-cell">{comment.lat}</td> {/* Mostrar latitud */}
-        <td className="comments-table-cell">{comment.lng}</td> {/* Mostrar longitud */}
-        <td className="comments-table-cell">
-          {new Date(comment.timestamp).toLocaleString()} {/* Mostrar hora en formato legible */}
-        </td>
-        <td className="comments-table-cell"><button onClick={() => deleteComment(comment.id)}>Eliminar</button></td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-    </div>
     </div>
     
   );
