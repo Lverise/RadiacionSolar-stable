@@ -398,7 +398,7 @@ const saveUVDataToFirestore = async (dataId: string, lat: number, lng: number, u
         <td className="comments-table-cell">
           {new Date(comment.timestamp).toLocaleString()} {/* Mostrar hora en formato legible */}
         </td>
-        <td className="comments-table-cell"><button onClick={() => deleteComment(comment.id)}>Eliminar</button></td>
+        <td className="comments-table-cell"><button className="eliminar-button" onClick={() => deleteComment(comment.id)}>Eliminar</button></td>
       </tr>
     ))}
   </tbody>
