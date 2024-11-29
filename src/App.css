@@ -15,23 +15,36 @@ header {
   text-align: center;
   margin-bottom: 20px;
   width: 100%;
+  background-color:#4C8BF5;
+  color: white; /* Letras blancas */
+  padding: 10px 0;
 }
 
 h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: white;
   margin: 0;
   padding-top: 10px;
+}
+
+input{
+  border-style: solid;
+  display: block;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 300px;
 }
 
 /* Estilos para la sección de información de UV */
 .container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Elementos en fila (información UV y mapa) */
   gap: 20px;
   width: 100%;
-  flex-grow: 1;
   justify-content: space-between;
+  padding: 20px;
+  flex-grow: 0.7;
 }
 
 .uv-info {
@@ -39,11 +52,11 @@ h1 {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 700px;
+  width: 48%; /* Asegura que ambas secciones tengan el mismo tamaño */
   text-align: center;
   margin: 0 auto;
   flex-shrink: 0;
+  
 }
 
 .uv-info p {
@@ -64,98 +77,64 @@ h1 {
   transition: width 0.3s ease, background-color 0.3s ease;
 }
 
-button.export-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  font-size: 1.1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: background-color 0.3s ease;
-  width: auto;
-  max-width: 250px;
-}
-
-button.export-button:hover {
-  background-color: #0056b3;
-}
-
 /* Estilos para el mapa */
 #map {
-  width: 100%;
-  height: 400px;
+  width: 48%; /* Asegura que ambas secciones tengan el mismo tamaño */
+  height: 100%;
   border-radius: 8px;
-  margin-top: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos para el dispositivo móvil */
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-    gap: 10px;
-    flex-direction: column;
-  }
-
-  .uv-info {
-    width: 90%;
-    padding: 15px;
-  }
-
-  .uv-info p {
-    font-size: 1rem;
-  }
-
-  h1 {
-    font-size: 2rem;
-  }
-
-  button.export-button {
-    font-size: 1rem;
-    padding: 12px 24px;
-  }
-
-  #map {
-    height: 300px;
-  }
+/* Estilo para el botón "admin" */
+.admin-button {
+  background-color: #4C8BF5; /* Azul más oscuro que el de exportar Excel */
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
+  max-width: 250px;
+  margin: 20px auto; /* Asegura que el botón esté centrado */
 }
 
-/* Estilos para el dispositivo de escritorio */
-@media (min-width: 769px) {
-  .container {
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 20px;
-  }
-
-  .uv-info {
-    width: 48%;
-  }
-
-  #map {
-    width: 48%;
-  }
+.login-button{
+  background-color: #4C8BF5; /* Azul más oscuro que el de exportar Excel */
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
+  max-width: 250px;
+  margin: auto;
+  margin-top: 20px;
+}
+.login-button:hover {
+  background-color: #3b6cb7; /* Azul más oscuro cuando se pasa el ratón */
 }
 
-/* Colores para la advertencia UV */
-.uv-info .low-uv {
-  color: #66cc66;
+/* Estilo para el hover del botón */
+.admin-button:hover {
+  background-color: #3b6cb7; /* Azul más oscuro cuando se pasa el ratón */
 }
 
-.uv-info .moderate-uv {
-  color: #ffcc00;
-}
-
-.uv-info .high-uv {
-  color: #ff9900;
-}
-
-.uv-info .very-high-uv {
-  color: #ff3300;
-}
-
-.uv-info .extreme-uv {
-  color: #b30000;
+.excel-button{
+  background-color: #4C8BF5; /* Azul más oscuro que el de exportar Excel */
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
+  max-width: 250px;
+  margin: auto;
+  margin-top: 20px;
+  display: block;
 }

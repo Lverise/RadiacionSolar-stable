@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import "./App.css";
 import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "./Firebase/Firebase";
+import "./App.css";
 import * as XLSX from "xlsx"; // Importar xlsx (SheetJS)
 
 // Tipos para la API de OpenUV
@@ -15,6 +15,10 @@ const App: React.FC = () => {
   const [uvWarning, setUVWarning] = useState<string>("");
   const [barColor, setBarColor] = useState<string>("#66cc66");
   const [barWidth, setBarWidth] = useState<string>("0%");
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showLogin, setShowLogin] = useState<boolean>(false); // Estado para controlar la visualización del login
 
   const defaultCoords = { lat: -27.376139, lng: -70.323444 };
 
@@ -161,7 +165,6 @@ const App: React.FC = () => {
     });
   };
 
-  // Función para exportar los datos de UV a Excel usando xlsx (SheetJS)
   const exportToExcel = async () => {
     try {
       const uvDataSnapshot = await getDocs(collection(db, "uvData"));
@@ -178,30 +181,25 @@ const App: React.FC = () => {
         });
       });
 
-      // Crear una hoja de trabajo con los datos
       const ws = XLSX.utils.json_to_sheet(uvDataList);
 
-      // Modificar encabezados de las columnas
       ws["!cols"] = [
-        { wpx: 100 },  // Ajuste de columna para latitud
-        { wpx: 100 },  // Ajuste de columna para longitud
-        { wpx: 120 },  // Ajuste de columna para nivel de UV
-        { wpx: 180 },  // Ajuste de columna para fecha
-        { wpx: 150 },  // Ajuste de columna para timestamp
+        { wpx: 100 },
+        { wpx: 100 },
+        { wpx: 120 },
+        { wpx: 180 },
+        { wpx: 150 },
       ];
 
-      // Cambiar los encabezados de las columnas
       ws["A1"].v = "Latitud";
       ws["B1"].v = "Longitud";
-      ws["C1"].v = "Nivel de UV";  // Título actualizado
+      ws["C1"].v = "Nivel de UV";
       ws["D1"].v = "Fecha";
       ws["E1"].v = "Hora de Consulta";
 
-      // Crear un libro de Excel
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Datos UV");
 
-      // Escribir el archivo de Excel y disparar la descarga
       XLSX.writeFile(wb, "datos_uv.xlsx");
 
       alert("Datos exportados a Excel correctamente.");
@@ -220,15 +218,42 @@ const App: React.FC = () => {
           <p><strong>Radiación UV:</strong> {uvValue !== null ? uvValue : "Cargando..."}</p>
           <p><strong>Ubicación:</strong> Selecciona en el mapa</p>
           <div className="uv-level">
-            <p><strong>Nivel de Radiación Solar:</strong> {uvLevel !== null ? uvLevel : "Cargando..."}</p>
-            <div className="uv-bar" style={{ width: barWidth, backgroundColor: barColor }} />
-            <p><strong>Advertencia:</strong> {uvWarning}</p>
+            <p><strong>Nivel de UV:</strong> {uvLevel}</p>
+            <div
+              className="uv-bar"
+              style={{ backgroundColor: barColor, width: barWidth }}
+            />
           </div>
+          <p className="warning">{uvWarning}</p>
         </div>
-
-        <div id="map" style={{ height: "400px", width: "100%" }} />
+        <div id="map" className="map" />
+      
       </div>
-      <button className="export-button" onClick={exportToExcel}>Exportar Datos a Excel</button>
+      <div className="admin-login-container">
+          <button className="admin-button" onClick={() => setShowLogin(true)}>Admin</button>
+        </div>
+        {showLogin && (
+          <div className="login-modal">
+            <div className="login-modal-content">
+              <input
+                type="text"
+                placeholder="Usuario"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button className="login-button" onClick={() => setIsAdmin(username === "admin" && password === "admin")}>
+                Ingresar
+              </button>
+              {isAdmin && <button className="excel-button" onClick={exportToExcel}>Exportar a Excel</button>}
+            </div>
+          </div>
+        )}
     </div>
   );
 };
